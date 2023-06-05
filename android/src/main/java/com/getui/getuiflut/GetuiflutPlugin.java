@@ -63,7 +63,8 @@ public class GetuiflutPlugin implements MethodCallHandler, FlutterPlugin {
         Default,
         onReceiveMessageData,
         onNotificationMessageArrived,
-        onNotificationMessageClicked
+        onNotificationMessageClicked,
+        onAliasResult
     }
 
     enum StateType {
@@ -101,7 +102,10 @@ public class GetuiflutPlugin implements MethodCallHandler, FlutterPlugin {
                     } else if (msg.arg1 == MessageType.onNotificationMessageClicked.ordinal()) {
                         GetuiflutPlugin.instance.channel.invokeMethod("onNotificationMessageClicked", msg.obj);
                         Log.d("flutterHandler", "onNotificationMessageClicked >>> " + msg.obj);
-                    } else {
+                    } else if (msg.arg1 == MessageType.onAliasResult.ordinal()) {
+                        GetuiflutPlugin.instance.channel.invokeMethod("onAliasResult", msg.obj);
+                        Log.d("flutterHandler", "onAliasResult >>> " + msg.obj);
+                    }else {
                         Log.d(TAG, "default Message type...");
                     }
                     break;
@@ -258,7 +262,9 @@ public class GetuiflutPlugin implements MethodCallHandler, FlutterPlugin {
             type = MessageType.onNotificationMessageArrived.ordinal();
         } else if (func.equals("onNotificationMessageClicked")) {
             type = MessageType.onNotificationMessageClicked.ordinal();
-        } else {
+        } else if (func.equals("onAliasResult")) {
+            type = MessageType.onAliasResult.ordinal();
+        }else {
             type = MessageType.Default.ordinal();
         }
         Message msg = Message.obtain();

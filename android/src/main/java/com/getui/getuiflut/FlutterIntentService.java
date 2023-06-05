@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.igexin.sdk.GTIntentService;
+import com.igexin.sdk.PushConsts;
+import com.igexin.sdk.message.BindAliasCmdMessage;
 import com.igexin.sdk.message.GTCmdMessage;
 import com.igexin.sdk.message.GTNotificationMessage;
 import com.igexin.sdk.message.GTTransmitMessage;
@@ -44,7 +46,36 @@ public class FlutterIntentService extends GTIntentService {
 
     @Override
     public void onReceiveCommandResult(Context context, GTCmdMessage gtCmdMessage) {
-        GetuiflutPlugin.transmitMessageReceive(gtCmdMessage.toString(), "onReceiveCommandResult");
+        int action = gtCmdMessage.getAction();
+
+        if (action == PushConsts.BIND_ALIAS_RESULT || action == PushConsts.UNBIND_ALIAS_RESULT) {
+            String sn = ((BindAliasCmdMessage) gtCmdMessage).getSn();
+            String code = ((BindAliasCmdMessage) gtCmdMessage).getCode();
+            /*  code 结果说明
+                0：成功
+                10099：SDK 未初始化成功
+                30001：绑定别名失败，频率过快，两次调用的间隔需大于 1s
+                30002：绑定别名失败，参数错误
+                30003：当前 cid 绑定别名次数超限
+                30004：绑定别名失败，未知异常
+                30005：绑定别名时，cid 未获取到
+                30006：绑定别名时，发生网络错误
+                30007：别名无效
+                30008：sn 无效 */
+
+
+            
+            Map<String, Object> result = new HashMap<>();
+            result.put("action", action == PushConsts.BIND_ALIAS_RESULT ? "bindAlias" : "unbindAlias");
+            result.put("sn", sn);
+            result.put("result", code == "0");
+            result.put("error", "error code:" + code);
+            GetuiflutPlugin.transmitMessageReceive(result, "onAliasResult");
+            Log.d(TAG, "bind alias result sn = " + sn + ", code = " + code);
+        } else{
+            GetuiflutPlugin.transmitMessageReceive(gtCmdMessage.toString(), "onReceiveCommandResult");
+        }
+        
     }
 
     @Override
