@@ -68,7 +68,7 @@ public class FlutterIntentService extends GTIntentService {
             Map<String, Object> result = new HashMap<>();
             result.put("action", action == PushConsts.BIND_ALIAS_RESULT ? "bindAlias" : "unbindAlias");
             result.put("sn", sn);
-            result.put("result", code == "0");
+            result.put("result", code.equals("0"));
             result.put("error", "error code:" + code);
             GetuiflutPlugin.transmitMessageReceive(result, "onAliasResult");
             Log.d(TAG, "bind alias result sn = " + sn + ", code = " + code);
